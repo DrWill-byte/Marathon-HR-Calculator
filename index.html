@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marathon Heart Rate Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+        
+        .input-section {
+            padding: 30px;
+            background: #f8f9fa;
+        }
+        
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .input-group label {
+            font-weight: 600;
+            color: #333;
+            min-width: 150px;
+        }
+        
+        .input-group input {
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+            flex: 1;
+            min-width: 100px;
+        }
+        
+        .input-group select {
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+            flex: 1;
+            min-width: 150px;
+            background: white;
+            cursor: pointer;
+        }
+        
+        .input-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .input-group span {
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .calculate-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            width: 100%;
+        }
+        
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .results {
+            padding: 30px;
+            display: none;
+        }
+        
+        .results.show {
+            display: block;
+        }
+        
+        .results h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            text-align: center;
+        }
+        
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .result-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.2s ease;
+        }
+        
+        .result-card:hover {
+            transform: translateY(-3px);
+        }
+        
+        .result-card h3 {
+            font-size: 1.1em;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+        
+        .result-card .hr-value {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .result-card .percentage {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+        
+        .result-card .max-hr {
+            font-size: 0.85em;
+            opacity: 0.9;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid rgba(255,255,255,0.3);
+        }
+        
+        .summary {
+            background: #e8f4fd;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .summary h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .summary p {
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        @media (max-width: 600px) {
+            .input-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .input-group label {
+                min-width: auto;
+            }
+            
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏃‍♂️ Marathon HR Calculator</h1>
+            <p>Calculate your target heart rates for each 30-minute section</p>
+        </div>
+        
+        <div class="input-section">
+            <div class="input-group">
+                <label for="thresholdHR">Threshold Heart Rate:</label>
+                <input type="number" id="thresholdHR" placeholder="Enter your threshold HR" min="120" max="220">
+                <span>bpm</span>
+            </div>
+            
+            <div class="input-group">
+                <label for="marathonTime">Marathon Goal:</label>
+                <select id="marathonTime">
+                    <option value="over3">Over 3 hours</option>
+                    <option value="under3">Under 3 hours</option>
+                </select>
+            </div>
+            
+            <button class="calculate-btn" onclick="calculateHR()">Calculate Marathon HR Targets</button>
+        </div>
+        
+        <div class="results" id="results">
+            <h2>Your Marathon HR Targets</h2>
+            <div class="results-grid" id="resultsGrid">
+                <!-- Results will be populated here -->
+            </div>
+            
+            <div class="summary">
+                <h3>💡 Marathon Pacing Strategy</h3>
+                <p>These heart rate targets show both your <strong>target HR</strong> and <strong>maximum HR</strong> for each section. The target HR is your steady effort pace, while the max HR gives you permission to push a little harder on uphills, headwinds, or when you're feeling strong - but don't exceed these limits to avoid burning out later in the race.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function calculateHR() {
+            const thresholdHR = parseInt(document.getElementById('thresholdHR').value);
+            const marathonTime = document.getElementById('marathonTime').value;
+            
+            if (!thresholdHR || thresholdHR < 120 || thresholdHR > 220) {
+                alert('Please enter a valid threshold heart rate (120-220 bpm)');
+                return;
+            }
+            
+            // Define percentages based on marathon goal time
+            let sections;
+            
+            if (marathonTime === 'over3') {
+                sections = [
+                    { time: '0-30 min', percentage: 88, maxPercentage: 92, phase: 'Conservative Start' },
+                    { time: '30-60 min', percentage: 89, maxPercentage: 92, phase: 'Settle In' },
+                    { time: '60-90 min', percentage: 90, maxPercentage: 94, phase: 'Build Rhythm' },
+                    { time: '90-120 min', percentage: 91, maxPercentage: 94, phase: 'Target Effort' },
+                    { time: '120-150 min', percentage: 93, maxPercentage: 96, phase: 'Hold Strong' },
+                    { time: '150-180 min', percentage: 94, maxPercentage: 97, phase: 'Push Through' },
+                    { time: '180+ min', percentage: 95, maxPercentage: 100, phase: 'Final Push' }
+                ];
+            } else {
+                sections = [
+                    { time: '0-30 min', percentage: 87, maxPercentage: 91, phase: 'Conservative Start' },
+                    { time: '30-60 min', percentage: 90, maxPercentage: 93, phase: 'Settle In' },
+                    { time: '60-90 min', percentage: 92, maxPercentage: 97, phase: 'Build Rhythm' },
+                    { time: '90-120 min', percentage: 95, maxPercentage: 98, phase: 'Target Effort' },
+                    { time: '120-150 min', percentage: 98, maxPercentage: 100, phase: 'Hold Strong' },
+                    { time: '150+ min', percentage: 98, maxPercentage: 104, phase: 'Final Push' }
+                ];
+            }
+            
+            const resultsGrid = document.getElementById('resultsGrid');
+            resultsGrid.innerHTML = '';
+            
+            sections.forEach((section, index) => {
+                const targetHR = Math.round((section.percentage / 100) * thresholdHR);
+                const maxHR = Math.round((section.maxPercentage / 100) * thresholdHR);
+                
+                const card = document.createElement('div');
+                card.className = 'result-card';
+                card.style.background = `linear-gradient(135deg, hsl(${200 + index * 20}, 70%, 60%) 0%, hsl(${220 + index * 20}, 70%, 70%) 100%)`;
+                
+                card.innerHTML = `
+                    <h3>${section.time}</h3>
+                    <div class="hr-value">${targetHR}</div>
+                    <div class="percentage">${section.percentage}% • ${section.phase}</div>
+                    <div class="max-hr">Max: ${maxHR} (${section.maxPercentage}%)</div>
+                `;
+                
+                resultsGrid.appendChild(card);
+            });
+            
+            document.getElementById('results').classList.add('show');
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Allow Enter key to calculate
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                calculateHR();
+            }
+        });
+        
+        // Set default values for demo
+        document.getElementById('thresholdHR').value = 180;
+    </script>
+</body>
+</html>
